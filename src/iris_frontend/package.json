@@ -1,0 +1,10 @@
+{
+    "name": "iris_frontend",
+    "version": "0.1.0",
+    "scripts": {
+        "start": "echo 'Frontend start'",
+        "prebuild": "echo 'Frontend prebuild'",
+        "build": "echo 'Frontend build completed'"
+    },
+    "devDependencies": {}
+}
