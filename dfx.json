@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "iris_backend": {
+      "candid": "src/iris_backend/iris_backend.did",
+      "package": "iris_backend",
+      "type": "rust"
+    },
+    "iris_frontend": {
+      "dependencies": [
+        "iris_backend"
+      ],
+      "source": [
+        "src/iris_frontend/assets"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
