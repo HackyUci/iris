@@ -3,6 +3,14 @@ use serde::Serialize;
 use crate::models::payment::PaymentStatus;
 
 #[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
+pub enum Currency {
+    USD,
+    GBP,
+    SGD,
+    IDR,
+}
+
+#[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
 pub struct Invoice {
     pub id: String,
     pub merchant_id: String,
@@ -12,12 +20,15 @@ pub struct Invoice {
     pub created_at: u64,
     pub updated_at: u64,
     pub description: Option<String>,
+    pub currency: Currency,
+    pub fiat_amount: f64,
 }
 
 #[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
 pub struct CreateInvoiceRequest {
     pub merchant_id: String,
-    pub amount_satoshi: u64,
+    pub fiat_amount: f64,
+    pub currency: Currency,
     pub description: Option<String>,
 }
 
@@ -29,6 +40,8 @@ impl Invoice {
         bitcoin_address: String,
         timestamp: u64,
         description: Option<String>,
+        currency: Currency,
+        fiat_amount: f64,
     ) -> Self {
         Self {
             id,
@@ -39,6 +52,8 @@ impl Invoice {
             created_at: timestamp,
             updated_at: timestamp,
             description,
+            currency,
+            fiat_amount,
         }
     }
     
