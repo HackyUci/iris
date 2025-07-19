@@ -58,6 +58,39 @@ type QRCodeData = record {
   bitcoin_uri : text;
 };
 
+type CashoutRequest = record {
+  id : text;
+  merchant_principal : principal;
+  amount_satoshi : nat64;
+  target_currency : Currency;
+  fiat_amount : float64;
+  status : CashoutStatus;
+  created_at : nat64;
+  bank_details : opt text;
+};
+
+type CashoutStatus = variant {
+  Pending;
+  Processing;
+  Completed;
+  Failed;
+};
+
+type CreateCashoutRequest = record {
+  amount_satoshi : nat64;
+  target_currency : Currency;
+  bank_details : opt text;
+};
+
+type MerchantBalance = record {
+  merchant_principal : principal;
+  total_satoshi : nat64;
+  pending_satoshi : nat64;
+  confirmed_satoshi : nat64;
+  preferred_currency : Currency;
+  last_updated : nat64;
+};
+
 type Result = variant { Ok : Invoice; Err : text };
 type Result_1 = variant { Ok : MerchantProfile; Err : text };
 type Result_2 = variant { Ok : PaymentStatus; Err : text };
@@ -65,17 +98,27 @@ type Result_3 = variant { Ok : QRCodeData; Err : text };
 type Result_4 = variant { Ok : nat64; Err : text };
 type Result_5 = variant { Ok : vec BitcoinUtxo; Err : text };
 type Result_6 = variant { Ok : vec Invoice; Err : text };
+type Result_7 = variant { Ok : MerchantBalance; Err : text };
+type Result_8 = variant { Ok : CashoutRequest; Err : text };
+type Result_9 = variant { Ok : vec CashoutRequest; Err : text };
+type Result_10 = variant { Ok; Err : text };
 
 service : {
   check_payment : (text) -> (Result_2);
+  create_cashout_request : (CreateCashoutRequest) -> (Result_8);
   create_invoice : (CreateInvoiceRequest) -> (Result);
   generate_qr_code : (text) -> (Result_3);
   get_bitcoin_balance : (text) -> (Result_4);
   get_bitcoin_utxos : (text) -> (Result_5);
   get_invoice : (text) -> (Result);
+  get_merchant_balance : () -> (Result_7) query;
   get_merchant_profile : () -> (Result_1) query;
+  get_my_cashout_requests : () -> (Result_9) query;
   get_my_invoices : () -> (Result_6) query;
   greet : (text) -> (text) query;
   register_merchant : (CreateMerchantRequest) -> (Result_1);
+  simulate_payment : (text) -> (Result_2);
+  update_merchant_balance : (text) -> (Result_10);
   whoami : () -> (text) query;
+  simulate_payment_confirmed : (text) -> (Result_2);
 }
