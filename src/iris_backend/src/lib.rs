@@ -101,7 +101,8 @@ async fn create_invoice(request: CreateInvoiceRequest) -> Result<Invoice, String
     
     let invoice_request = CreateInvoiceRequest {
         merchant_id: principal_string.clone(),
-        amount_satoshi: request.amount_satoshi,
+        fiat_amount: request.fiat_amount,
+        currency: request.currency,
         description: request.description,
     };
     
