@@ -1,5 +1,5 @@
 use crate::models::{Invoice, CreateInvoiceRequest, PaymentStatus};
-use crate::services::BitcoinService;
+use crate::services::{BitcoinService, ExchangeService};
 use ic_cdk::api::time;
 
 pub struct InvoiceService;
@@ -9,13 +9,17 @@ impl InvoiceService {
         let bitcoin_address = BitcoinService::generate_bitcoin_address().await?;
         let current_time = time();
         
+        let amount_satoshi = ExchangeService::fiat_to_satoshi(request.fiat_amount, &request.currency);
+        
         let invoice = Invoice::new(
             invoice_id,
             request.merchant_id,
-            request.amount_satoshi,
+            amount_satoshi,
             bitcoin_address.address,
             current_time,
             request.description,
+            request.currency,
+            request.fiat_amount,
         );
         
         Ok(invoice)
