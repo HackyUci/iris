@@ -5,9 +5,17 @@ type BitcoinUtxo = record {
   confirmations : nat32;
 };
 
+type Currency = variant {
+  USD;
+  GBP;
+  SGD;
+  IDR;
+};
+
 type CreateInvoiceRequest = record {
   merchant_id : text;
-  amount_satoshi : nat64;
+  fiat_amount : float64;
+  currency : Currency;
   description : opt text;
 };
 
@@ -24,6 +32,8 @@ type Invoice = record {
   created_at : nat64;
   updated_at : nat64;
   description : opt text;
+  currency : Currency;
+  fiat_amount : float64;
 };
 
 type MerchantProfile = record {
