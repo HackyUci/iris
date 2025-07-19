@@ -1,3 +1,79 @@
+type PaymentStatus = variant {
+    Pending;
+    Confirmed;
+    Completed;
+    Failed;
+};
+
+type Invoice = record {
+    id: text;
+    merchant_id: text;
+    amount_satoshi: nat64;
+    bitcoin_address: text;
+    status: PaymentStatus;
+    created_at: nat64;
+    updated_at: nat64;
+    description: opt text;
+};
+
+type QRCodeData = record {
+    bitcoin_address: text;
+    amount_satoshi: nat64;
+    invoice_id: text;
+    qr_code_svg: text;
+    bitcoin_uri: text;
+};
+
+type CreateInvoiceRequest = record {
+    merchant_id: text;
+    amount_satoshi: nat64;
+    description: opt text;
+};
+
+type BitcoinUtxo = record {
+    txid: text;
+    vout: nat32;
+    value: nat64;
+    confirmations: nat32;
+};
+
+type BitcoinAddress = record {
+    address: text;
+    derivation_path: blob;
+};
+
+type Result_Invoice = variant {
+    Ok: Invoice;
+    Err: text;
+};
+
+type Result_QRCodeData = variant {
+    Ok: QRCodeData;
+    Err: text;
+};
+
+type Result_PaymentStatus = variant {
+    Ok: PaymentStatus;
+    Err: text;
+};
+
+type Result_nat64 = variant {
+    Ok: nat64;
+    Err: text;
+};
+
+type Result_BitcoinUtxos = variant {
+    Ok: vec BitcoinUtxo;
+    Err: text;
+};
+
 service : {
-    "greet": (text) -> (text) query;
+    create_invoice: (CreateInvoiceRequest) -> (Result_Invoice);
+    generate_qr_code: (text) -> (Result_QRCodeData);
+    check_payment: (text) -> (Result_PaymentStatus);
+    get_invoice: (text) -> (Result_Invoice) query;
+    get_merchant_invoices: (text) -> (vec Invoice) query;
+    get_bitcoin_balance: (text) -> (Result_nat64);
+    get_bitcoin_utxos: (text) -> (Result_BitcoinUtxos);
+    greet: (text) -> (text) query;
 }
