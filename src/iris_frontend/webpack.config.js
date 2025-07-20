@@ -4,18 +4,13 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
-const frontend_entry = path.join(__dirname, "src", "index.tsx");
+require('dotenv').config({ path: '../../.env' });
 
 module.exports = {
   target: "web",
   mode: isDevelopment ? "development" : "production",
-  entry: {
-    index: frontend_entry,
-  },
+  entry: "./src/index.tsx",
   devtool: isDevelopment ? "source-map" : false,
-  optimization: {
-    minimize: !isDevelopment,
-  },
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx"],
     fallback: {
@@ -24,6 +19,8 @@ module.exports = {
       events: require.resolve("events/"),
       stream: require.resolve("stream-browserify/"),
       util: require.resolve("util/"),
+      crypto: require.resolve("crypto-browserify"),
+      vm: require.resolve("vm-browserify"),
     },
   },
   output: {
@@ -33,39 +30,26 @@ module.exports = {
   module: {
     rules: [
       { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
-      { test: /\.css$/, use: ['style-loader','css-loader'] }
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "index.html"),
-      cache: false,
     }),
-    new webpack.EnvironmentPlugin([
-      ...Object.keys(process.env).filter((key) => {
-        if (key.includes("CANISTER")) return true;
-        if (key.includes("DFX")) return true;
-        return false;
-      }),
-    ]),
+    new webpack.DefinePlugin({
+      'process.env.CANISTER_ID_IRIS_BACKEND': JSON.stringify(process.env.CANISTER_ID_IRIS_BACKEND),
+      'process.env.CANISTER_ID_IRIS_FRONTEND': JSON.stringify(process.env.CANISTER_ID_IRIS_FRONTEND),
+      'process.env.CANISTER_ID_INTERNET_IDENTITY': JSON.stringify(process.env.CANISTER_ID_INTERNET_IDENTITY),
+      'process.env.DFX_NETWORK': JSON.stringify(process.env.DFX_NETWORK || 'local'),
+    }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
       process: require.resolve("process/browser"),
+      crypto: "crypto-browserify",
     }),
   ],
   devServer: {
-    proxy: {
-      "/api": {
-        target: "http://127.0.0.1:4943",
-        changeOrigin: true,
-        pathRewrite: {
-          "^/api": "/api",
-        },
-      },
-    },
-    static: path.resolve(__dirname, "assets"),
+    port: 8080,
     hot: true,
-    watchFiles: [path.resolve(__dirname, "src")],
-    liveReload: true,
   },
 };
