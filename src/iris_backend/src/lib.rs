@@ -1,13 +1,15 @@
 mod models;
 mod services;
 
-use candid::{candid_method, Principal};
+use candid::{candid_method, Principal, CandidType};
 use ic_cdk::api::time;
 use ic_cdk_macros::{init, query, update};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use models::*;
 use services::*;
+use serde::{Serialize, Deserialize};
+
 
 thread_local! {
     static INVOICES: RefCell<HashMap<String, Invoice>> = RefCell::new(HashMap::new());
@@ -37,6 +39,16 @@ pub struct MerchantBalance {
     pub confirmed_satoshi: u64,
     pub preferred_currency: Currency,
     pub last_updated: u64,
+}
+
+#[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
+pub struct MerchantDashboard {
+    pub total_invoices: u64,
+    pub pending_payments: u64,
+    pub completed_payments: u64,
+    pub total_balance_satoshi: u64,
+    pub total_balance_fiat: f64,
+    pub preferred_currency: Currency,
 }
 
 #[derive(candid::CandidType, candid::Deserialize, serde::Serialize, Clone, Debug)]
@@ -686,4 +698,125 @@ fn get_invoice_payment_info(invoice_id: String) -> Result<String, String> {
     );
     
     Ok(info)
+}
+
+#[update]
+#[candid_method(update)]
+async fn generate_invoice_qr(invoice_id: String) -> Result<QRCodeData, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Merchant {
+        return Err("Only merchants can generate invoice QR".to_string());
+    }
+    
+    let principal = get_caller_principal()?;
+    let principal_string = principal.to_string();
+    
+    let invoice = INVOICES.with(|invoices| {
+        invoices.borrow().get(&invoice_id).cloned()
+    }).ok_or("Invoice not found")?;
+    
+    if invoice.merchant_id != principal_string {
+        return Err("Unauthorized: Invoice does not belong to you".to_string());
+    }
+    
+    let qr_request = QRCodeRequest::new(
+        invoice.bitcoin_address.clone(),
+        invoice.amount_satoshi,
+        invoice_id,
+    ).with_message(format!("Pay {} {}", invoice.fiat_amount, format!("{:?}", invoice.currency)));
+    
+    let qr_data = QRService::generate_qr_code(qr_request);
+    Ok(qr_data)
+}
+
+#[query]
+#[candid_method(query)]
+fn get_invoice_by_qr_scan(invoice_id: String) -> Result<Invoice, String> {
+    INVOICES.with(|invoices| {
+        invoices.borrow().get(&invoice_id).cloned()
+    }).ok_or("Invoice not found".to_string())
+}
+
+#[update]
+#[candid_method(update)]
+async fn check_invoice_status(invoice_id: String) -> Result<PaymentStatus, String> {
+    let invoice = INVOICES.with(|invoices| {
+        invoices.borrow().get(&invoice_id).cloned()
+    }).ok_or("Invoice not found")?;
+    
+    Ok(invoice.status)
+}
+
+#[query]
+#[candid_method(query)]
+fn get_merchant_dashboard() -> Result<MerchantDashboard, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Merchant {
+        return Err("Only merchants can access dashboard".to_string());
+    }
+    
+    let principal = get_caller_principal()?;
+    let principal_string = principal.to_string();
+    
+    let merchant = MERCHANT_PROFILES.with(|profiles| {
+        profiles.borrow().get(&principal_string).cloned()
+    }).ok_or("Merchant not registered")?;
+    
+    let balance = MERCHANT_BALANCES.with(|balances| {
+        balances.borrow().get(&principal_string).cloned()
+    }).unwrap_or(MerchantBalance {
+        merchant_principal: principal,
+        total_satoshi: 0,
+        pending_satoshi: 0,
+        confirmed_satoshi: 0,
+        preferred_currency: Currency::USD,
+        last_updated: 0,
+    });
+    
+    let invoices = INVOICES.with(|invoices| {
+        let all_invoices: Vec<Invoice> = invoices.borrow().values().cloned().collect();
+        InvoiceService::filter_merchant_invoices(&all_invoices, &principal_string)
+    });
+    
+    let pending_payments = invoices.iter().filter(|i| matches!(i.status, PaymentStatus::Pending | PaymentStatus::Confirmed)).count() as u64;
+    let completed_payments = invoices.iter().filter(|i| matches!(i.status, PaymentStatus::Completed)).count() as u64;
+    
+    let total_balance_fiat = ExchangeService::satoshi_to_fiat(balance.total_satoshi, &balance.preferred_currency);
+    
+    Ok(MerchantDashboard {
+        total_invoices: merchant.total_invoices,
+        pending_payments,
+        completed_payments,
+        total_balance_satoshi: balance.total_satoshi,
+        total_balance_fiat,
+        preferred_currency: balance.preferred_currency,
+    })
+}
+
+#[query]
+#[candid_method(query)]
+fn get_all_currencies() -> Vec<Currency> {
+    vec![Currency::USD, Currency::GBP, Currency::SGD, Currency::IDR]
+}
+
+#[update]
+#[candid_method(update)]
+async fn set_preferred_currency(currency: Currency) -> Result<(), String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Merchant {
+        return Err("Only merchants can set preferred currency".to_string());
+    }
+    
+    let principal = get_caller_principal()?;
+    let principal_string = principal.to_string();
+    
+    MERCHANT_BALANCES.with(|balances| {
+        let mut balances_map = balances.borrow_mut();
+        if let Some(balance) = balances_map.get_mut(&principal_string) {
+            balance.preferred_currency = currency;
+            balance.last_updated = time();
+        }
+    });
+    
+    Ok(())
 }
