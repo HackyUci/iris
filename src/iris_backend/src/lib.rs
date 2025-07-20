@@ -555,3 +555,135 @@ candid::export_service!();
 fn export_candid() -> String {
     __export_service()
 }
+
+#[update]
+#[candid_method(update)]
+async fn simulate_usd_payment(request: MockUSDPaymentRequest) -> Result<PaymentStatus, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Customer {
+        return Err("Only customers can make payments".to_string());
+    }
+    
+    let mut invoice = INVOICES.with(|invoices| {
+        invoices.borrow().get(&request.invoice_id).cloned()
+    }).ok_or("Invoice not found")?;
+    
+    let btc_rate = ExchangeService::get_btc_rate(&Currency::USD);
+    let btc_amount = request.usd_amount / btc_rate;
+    let satoshi_amount = (btc_amount * 100_000_000.0) as u64;
+    
+    if satoshi_amount >= invoice.amount_satoshi {
+        let current_time = time();
+        
+        if invoice.status == PaymentStatus::Pending {
+            invoice.update_status(PaymentStatus::Confirmed, current_time)?;
+        } else if invoice.status == PaymentStatus::Confirmed {
+            invoice.update_status(PaymentStatus::Completed, current_time)?;
+        }
+        
+        INVOICES.with(|invoices| {
+            invoices.borrow_mut().insert(request.invoice_id.clone(), invoice.clone());
+        });
+        
+        update_merchant_balance(request.invoice_id).await?;
+        Ok(invoice.status)
+    } else {
+        Err("Insufficient USD amount".to_string())
+    }
+}
+
+#[update]
+#[candid_method(update)]
+async fn simulate_plug_wallet_payment(invoice_id: String) -> Result<PaymentStatus, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Customer {
+        return Err("Only customers can make payments".to_string());
+    }
+    
+    let mut invoice = INVOICES.with(|invoices| {
+        invoices.borrow().get(&invoice_id).cloned()
+    }).ok_or("Invoice not found")?;
+    
+    let current_time = time();
+    
+    if invoice.status == PaymentStatus::Pending {
+        invoice.update_status(PaymentStatus::Confirmed, current_time)?;
+    } else if invoice.status == PaymentStatus::Confirmed {
+        invoice.update_status(PaymentStatus::Completed, current_time)?;
+    }
+    
+    INVOICES.with(|invoices| {
+        invoices.borrow_mut().insert(invoice_id.clone(), invoice.clone());
+    });
+    
+    update_merchant_balance(invoice_id).await?;
+    Ok(invoice.status)
+}
+
+#[update]
+#[candid_method(update)]
+async fn simulate_external_wallet_payment(invoice_id: String) -> Result<PaymentStatus, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Customer {
+        return Err("Only customers can make payments".to_string());
+    }
+    
+    let mut invoice = INVOICES.with(|invoices| {
+        invoices.borrow().get(&invoice_id).cloned()
+    }).ok_or("Invoice not found")?;
+    
+    let current_time = time();
+    invoice.update_status(PaymentStatus::Confirmed, current_time)?;
+    
+    INVOICES.with(|invoices| {
+        invoices.borrow_mut().insert(invoice_id.clone(), invoice.clone());
+    });
+    
+    update_merchant_balance(invoice_id).await?;
+    Ok(PaymentStatus::Confirmed)
+}
+
+#[query]
+#[candid_method(query)]
+fn get_usd_to_btc_rate() -> f64 {
+    ExchangeService::get_btc_rate(&Currency::USD)
+}
+
+#[query]
+#[candid_method(query)]
+fn convert_usd_to_satoshi(usd_amount: f64) -> u64 {
+    ExchangeService::fiat_to_satoshi(usd_amount, &Currency::USD)
+}
+
+#[query]
+#[candid_method(query)]
+fn get_payment_methods() -> Vec<PaymentMethod> {
+    vec![
+        PaymentMethod::VirtualWallet,
+        PaymentMethod::PlugWallet,
+        PaymentMethod::MockUSD,
+        PaymentMethod::ExternalWallet,
+    ]
+}
+
+#[query]
+#[candid_method(query)]
+fn get_invoice_payment_info(invoice_id: String) -> Result<String, String> {
+    let invoice = INVOICES.with(|invoices| {
+        invoices.borrow().get(&invoice_id).cloned()
+    }).ok_or("Invoice not found")?;
+    
+    let btc_amount = invoice.amount_btc();
+    let usd_equivalent = ExchangeService::satoshi_to_fiat(invoice.amount_satoshi, &Currency::USD);
+    
+    let info = format!(
+        "Invoice: {} | Amount: {} BTC ({:.2} USD) | Address: {} | Status: {:?}",
+        invoice.id,
+        btc_amount,
+        usd_equivalent,
+        invoice.bitcoin_address,
+        invoice.status
+    );
+    
+    Ok(info)
+}
