@@ -107,6 +107,18 @@ type RegisterUserRequest = record {
   role : UserRole;
 };
 
+type PaymentMethod = variant {
+  VirtualWallet;
+  PlugWallet;
+  MockUSD;
+  ExternalWallet;
+};
+
+type MockUSDPaymentRequest = record {
+  invoice_id : text;
+  usd_amount : float64;
+};
+
 
 type Result = variant { Ok : Invoice; Err : text };
 type Result_1 = variant { Ok : MerchantProfile; Err : text };
@@ -120,7 +132,7 @@ type Result_8 = variant { Ok : CashoutRequest; Err : text };
 type Result_9 = variant { Ok : vec CashoutRequest; Err : text };
 type Result_10 = variant { Ok; Err : text };
 type Result_11 = variant { Ok : UserProfile; Err : text };
-
+type Result_12 = variant { Ok : text; Err : text };
 
 service : {
   register_user : (RegisterUserRequest) -> (Result_11);
@@ -128,6 +140,13 @@ service : {
   get_merchant_static_qr : () -> (Result_3) query;
   track_payment_to_static_address : (text, text) -> (Result_10);
   get_payments_for_address : (text) -> (vec text) query;
+  simulate_usd_payment : (MockUSDPaymentRequest) -> (Result_2);
+  simulate_plug_wallet_payment : (text) -> (Result_2);
+  simulate_external_wallet_payment : (text) -> (Result_2);
+  get_usd_to_btc_rate : () -> (float64) query;
+  convert_usd_to_satoshi : (float64) -> (nat64) query;
+  get_payment_methods : () -> (vec PaymentMethod) query;
+  get_invoice_payment_info : (text) -> (Result_12) query;
   check_payment : (text) -> (Result_2);
   create_cashout_request : (CreateCashoutRequest) -> (Result_8);
   create_invoice : (CreateInvoiceRequest) -> (Result);
