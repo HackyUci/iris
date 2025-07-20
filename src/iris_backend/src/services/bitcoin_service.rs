@@ -1,3 +1,4 @@
+use candid::Principal;
 use ic_cdk::api::management_canister::bitcoin::{
     bitcoin_get_balance, bitcoin_get_utxos, BitcoinNetwork, GetBalanceRequest, GetUtxosRequest,
 };
@@ -111,5 +112,31 @@ impl BitcoinService {
         } else {
             Ok(PaymentStatus::Pending)
         }
+    }
+
+    pub fn generate_static_address(merchant_principal: &Principal) -> String {
+        let principal_bytes = merchant_principal.as_slice();
+        let mut hasher = Sha256::new();
+        hasher.update(b"iris_static_address");
+        hasher.update(principal_bytes);
+        let hash = hasher.finalize();
+        
+        let mut ripemd = ripemd::Ripemd160::new();
+        ripemd.update(&hash);
+        let ripemd_hash = ripemd.finalize();
+        
+        let mut version_hash = vec![0x6f];
+        version_hash.extend_from_slice(&ripemd_hash);
+        
+        let mut hasher1 = Sha256::new();
+        hasher1.update(&version_hash);
+        let checksum1 = hasher1.finalize();
+        
+        let mut hasher2 = Sha256::new();
+        hasher2.update(&checksum1);
+        let checksum2 = hasher2.finalize();
+        
+        version_hash.extend_from_slice(&checksum2[..4]);
+        bs58::encode(version_hash).into_string()
     }
 }
