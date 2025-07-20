@@ -41,6 +41,7 @@ type MerchantProfile = record {
   business_name : text;
   created_at : nat64;
   total_invoices : nat64;
+  static_bitcoin_address : text;
 };
 
 type PaymentStatus = variant {
@@ -124,6 +125,9 @@ type Result_11 = variant { Ok : UserProfile; Err : text };
 service : {
   register_user : (RegisterUserRequest) -> (Result_11);
   get_user_profile : () -> (Result_11) query;
+  get_merchant_static_qr : () -> (Result_3) query;
+  track_payment_to_static_address : (text, text) -> (Result_10);
+  get_payments_for_address : (text) -> (vec text) query;
   check_payment : (text) -> (Result_2);
   create_cashout_request : (CreateCashoutRequest) -> (Result_8);
   create_invoice : (CreateInvoiceRequest) -> (Result);
