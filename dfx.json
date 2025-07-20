@@ -11,7 +11,7 @@
         "iris_backend"
       ],
       "source": [
-        "src/iris_frontend/assets"
+        "src/iris_frontend/dist"
       ],
       "type": "assets"
     }
