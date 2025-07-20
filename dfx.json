@@ -3,8 +3,7 @@
     "iris_backend": {
       "candid": "src/iris_backend/iris_backend.did",
       "package": "iris_backend",
-      "type": "rust",
-      "init_arg": "(record { bitcoin_network = variant { testnet }; ecdsa_key_name = \"test_key_1\" })"
+      "type": "rust"
     },
     "iris_frontend": {
       "dependencies": [
@@ -14,6 +13,11 @@
         "src/iris_frontend/dist"
       ],
       "type": "assets"
+    },
+    "internet_identity": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
     }
   },
   "defaults": {
@@ -30,12 +34,8 @@
       "bind": "127.0.0.1:4943",
       "type": "ephemeral",
       "replica": {
-        "subnet_type": "application"
+        "subnet_type": "system"
       }
-    },
-    "ic": {
-      "providers": ["https://ic0.app"],
-      "type": "persistent"
     }
   },
   "output_env_file": ".env",
