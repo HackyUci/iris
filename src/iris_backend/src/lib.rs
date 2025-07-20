@@ -16,6 +16,7 @@ thread_local! {
     static MERCHANT_BALANCES: RefCell<HashMap<String, MerchantBalance>> = RefCell::new(HashMap::new());
     static CASHOUT_REQUESTS: RefCell<HashMap<String, CashoutRequest>> = RefCell::new(HashMap::new());
     static CASHOUT_COUNTER: RefCell<u64> = RefCell::new(0);
+    static USER_PROFILES: RefCell<HashMap<String, UserProfile>> = RefCell::new(HashMap::new());
 }
 
 #[derive(candid::CandidType, candid::Deserialize, serde::Serialize, Clone, Debug)]
@@ -85,9 +86,13 @@ fn get_caller_principal() -> Result<Principal, String> {
 #[update]
 #[candid_method(update)]
 async fn register_merchant(request: CreateMerchantRequest) -> Result<MerchantProfile, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Merchant {
+        return Err("Only users with merchant role can register as merchant".to_string());
+    }
+    
     let principal = get_caller_principal()?;
     let current_time = time();
-    
     let principal_string = principal.to_string();
     
     let existing_merchant = MERCHANT_PROFILES.with(|profiles| {
@@ -99,7 +104,7 @@ async fn register_merchant(request: CreateMerchantRequest) -> Result<MerchantPro
     }
     
     let merchant_profile = MerchantProfile {
-        merchant_principal: principal, 
+        merchant_principal: principal,
         business_name: request.business_name,
         created_at: current_time,
         total_invoices: 0,
@@ -111,6 +116,7 @@ async fn register_merchant(request: CreateMerchantRequest) -> Result<MerchantPro
     
     Ok(merchant_profile)
 }
+
 
 #[query]
 #[candid_method(query)]
@@ -126,6 +132,11 @@ fn get_merchant_profile() -> Result<MerchantProfile, String> {
 #[update]
 #[candid_method(update)]
 async fn create_invoice(request: CreateInvoiceRequest) -> Result<Invoice, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Merchant {
+        return Err("Only merchants can create invoices".to_string());
+    }
+    
     let principal = get_caller_principal()?;
     let principal_string = principal.to_string();
     
@@ -423,6 +434,50 @@ async fn simulate_payment_confirmed(invoice_id: String) -> Result<PaymentStatus,
     update_merchant_balance(invoice_id).await?;
     
     Ok(PaymentStatus::Confirmed)
+}
+
+#[update]
+#[candid_method(update)]
+fn register_user(request: RegisterUserRequest) -> Result<UserProfile, String> {
+    let principal = get_caller_principal()?;
+    let current_time = time();
+    let principal_string = principal.to_string();
+    
+    let existing_user = USER_PROFILES.with(|profiles| {
+        profiles.borrow().get(&principal_string).cloned()
+    });
+    
+    if existing_user.is_some() {
+        return Err("User already registered".to_string());
+    }
+    
+    let user_profile = UserProfile {
+        user_principal: principal,
+        role: request.role,
+        created_at: current_time,
+    };
+    
+    USER_PROFILES.with(|profiles| {
+        profiles.borrow_mut().insert(principal_string, user_profile.clone());
+    });
+    
+    Ok(user_profile)
+}
+
+#[query]
+#[candid_method(query)]
+fn get_user_profile() -> Result<UserProfile, String> {
+    let principal = get_caller_principal()?;
+    let principal_string = principal.to_string();
+    
+    USER_PROFILES.with(|profiles| {
+        profiles.borrow().get(&principal_string).cloned()
+    }).ok_or("User not found. Please register first.".to_string())
+}
+
+fn get_user_role() -> Result<UserRole, String> {
+    let user = get_user_profile()?;
+    Ok(user.role)
 }
 
 #[query]
