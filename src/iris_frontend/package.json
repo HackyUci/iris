@@ -6,9 +6,13 @@
         "start": "webpack serve --mode development --env development",
         "build": "webpack --mode production --env production",
         "prebuild": "npm run copy:types",
-        "copy:types": "rsync -avr ../../.dfx/local/canisters/iris_backend/ src/declarations/"
+        "copy:types": "rsync -avr --exclude=\"index.js\" ../../.dfx/local/canisters/iris_backend/ src/declarations/"
     },
     "dependencies": {
+        "@dfinity/agent": "^2.0.0",
+        "@dfinity/auth-client": "^2.0.0",
+        "@dfinity/candid": "^2.0.0",
+        "@dfinity/principal": "^2.0.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     },
@@ -17,15 +21,16 @@
         "@types/react-dom": "^18.3.7",
         "assert": "^2.1.0",
         "buffer": "^6.0.3",
-        "css-loader": "^7.1.2",
+        "crypto-browserify": "^3.12.1",
+        "dotenv": "^17.2.0",
         "events": "^3.3.0",
         "html-webpack-plugin": "^5.6.3",
         "process": "^0.11.10",
         "stream-browserify": "^3.0.0",
-        "style-loader": "^4.0.0",
         "ts-loader": "^9.5.2",
         "typescript": "^5.0.0",
         "util": "^0.12.5",
+        "vm-browserify": "^1.1.2",
         "webpack": "^5.100.2",
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^4.15.2"
