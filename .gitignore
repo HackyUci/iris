@@ -27,26 +27,4 @@ dist/
 deps/
 .dfx/
 
-# DFX dependencies
-deps/
-.dfx/
 
-# Internet Identity clone (jika ada)
-internet-identity/
-
-# Environment files
-.env
-
-# Build outputs
-dist/
-node_modules/
-target/
-
-# OS files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
