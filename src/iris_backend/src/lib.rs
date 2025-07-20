@@ -17,6 +17,7 @@ thread_local! {
     static CASHOUT_REQUESTS: RefCell<HashMap<String, CashoutRequest>> = RefCell::new(HashMap::new());
     static CASHOUT_COUNTER: RefCell<u64> = RefCell::new(0);
     static USER_PROFILES: RefCell<HashMap<String, UserProfile>> = RefCell::new(HashMap::new());
+    static STATIC_PAYMENTS: RefCell<HashMap<String, Vec<String>>> = RefCell::new(HashMap::new());
 }
 
 #[derive(candid::CandidType, candid::Deserialize, serde::Serialize, Clone, Debug)]
@@ -25,6 +26,7 @@ pub struct MerchantProfile {
     pub business_name: String,
     pub created_at: u64,
     pub total_invoices: u64,
+    pub static_bitcoin_address: String,
 }
 
 #[derive(candid::CandidType, candid::Deserialize, serde::Serialize, Clone, Debug)]
@@ -103,11 +105,14 @@ async fn register_merchant(request: CreateMerchantRequest) -> Result<MerchantPro
         return Err("Merchant already registered".to_string());
     }
     
+    let static_address = BitcoinService::generate_static_address(&principal);
+    
     let merchant_profile = MerchantProfile {
         merchant_principal: principal,
         business_name: request.business_name,
         created_at: current_time,
         total_invoices: 0,
+        static_bitcoin_address: static_address,
     };
     
     MERCHANT_PROFILES.with(|profiles| {
@@ -116,6 +121,8 @@ async fn register_merchant(request: CreateMerchantRequest) -> Result<MerchantPro
     
     Ok(merchant_profile)
 }
+
+
 
 
 #[query]
@@ -140,7 +147,7 @@ async fn create_invoice(request: CreateInvoiceRequest) -> Result<Invoice, String
     let principal = get_caller_principal()?;
     let principal_string = principal.to_string();
     
-    let _merchant = MERCHANT_PROFILES.with(|profiles| {
+    let merchant = MERCHANT_PROFILES.with(|profiles| {
         profiles.borrow().get(&principal_string).cloned()
     }).ok_or("Merchant not registered. Please register first.")?;
     
@@ -150,14 +157,19 @@ async fn create_invoice(request: CreateInvoiceRequest) -> Result<Invoice, String
         InvoiceService::generate_invoice_id(*c)
     });
     
-    let invoice_request = CreateInvoiceRequest {
-        merchant_id: principal_string.clone(),
-        fiat_amount: request.fiat_amount,
-        currency: request.currency,
-        description: request.description,
-    };
+    let current_time = time();
+    let amount_satoshi = ExchangeService::fiat_to_satoshi(request.fiat_amount, &request.currency);
     
-    let invoice = InvoiceService::create_invoice(invoice_request, invoice_id.clone()).await?;
+    let invoice = Invoice::new(
+        invoice_id.clone(),
+        principal_string.clone(),
+        amount_satoshi,
+        merchant.static_bitcoin_address,
+        current_time,
+        request.description,
+        request.currency,
+        request.fiat_amount,
+    );
     
     INVOICES.with(|invoices| {
         invoices.borrow_mut().insert(invoice_id.clone(), invoice.clone());
@@ -172,6 +184,7 @@ async fn create_invoice(request: CreateInvoiceRequest) -> Result<Invoice, String
     
     Ok(invoice)
 }
+
 
 #[update]
 #[candid_method(update)]
@@ -256,6 +269,32 @@ fn get_my_invoices() -> Result<Vec<Invoice>, String> {
     
     Ok(invoices)
 }
+
+#[query]
+#[candid_method(query)]
+fn get_merchant_static_qr() -> Result<QRCodeData, String> {
+    let user_role = get_user_role()?;
+    if user_role != UserRole::Merchant {
+        return Err("Only merchants can get static QR".to_string());
+    }
+    
+    let principal = get_caller_principal()?;
+    let principal_string = principal.to_string();
+    
+    let merchant = MERCHANT_PROFILES.with(|profiles| {
+        profiles.borrow().get(&principal_string).cloned()
+    }).ok_or("Merchant not registered")?;
+    
+    let qr_request = QRCodeRequest::new(
+        merchant.static_bitcoin_address.clone(),
+        0,
+        format!("STATIC-{}", principal_string),
+    ).with_label(merchant.business_name);
+    
+    let qr_data = QRService::generate_qr_code(qr_request);
+    Ok(qr_data)
+}
+
 
 #[update]
 #[candid_method(update)]
@@ -434,6 +473,24 @@ async fn simulate_payment_confirmed(invoice_id: String) -> Result<PaymentStatus,
     update_merchant_balance(invoice_id).await?;
     
     Ok(PaymentStatus::Confirmed)
+}
+
+#[update]
+#[candid_method(update)]
+async fn track_payment_to_static_address(bitcoin_address: String, invoice_id: String) -> Result<(), String> {
+    STATIC_PAYMENTS.with(|payments| {
+        let mut payments_map = payments.borrow_mut();
+        payments_map.entry(bitcoin_address).or_insert_with(Vec::new).push(invoice_id);
+    });
+    Ok(())
+}
+
+#[query]
+#[candid_method(query)]
+fn get_payments_for_address(bitcoin_address: String) -> Vec<String> {
+    STATIC_PAYMENTS.with(|payments| {
+        payments.borrow().get(&bitcoin_address).cloned().unwrap_or_default()
+    })
 }
 
 #[update]
