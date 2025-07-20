@@ -91,6 +91,22 @@ type MerchantBalance = record {
   last_updated : nat64;
 };
 
+type UserRole = variant {
+  Customer;
+  Merchant;
+};
+
+type UserProfile = record {
+  user_principal : principal;
+  role : UserRole;
+  created_at : nat64;
+};
+
+type RegisterUserRequest = record {
+  role : UserRole;
+};
+
+
 type Result = variant { Ok : Invoice; Err : text };
 type Result_1 = variant { Ok : MerchantProfile; Err : text };
 type Result_2 = variant { Ok : PaymentStatus; Err : text };
@@ -102,8 +118,12 @@ type Result_7 = variant { Ok : MerchantBalance; Err : text };
 type Result_8 = variant { Ok : CashoutRequest; Err : text };
 type Result_9 = variant { Ok : vec CashoutRequest; Err : text };
 type Result_10 = variant { Ok; Err : text };
+type Result_11 = variant { Ok : UserProfile; Err : text };
+
 
 service : {
+  register_user : (RegisterUserRequest) -> (Result_11);
+  get_user_profile : () -> (Result_11) query;
   check_payment : (text) -> (Result_2);
   create_cashout_request : (CreateCashoutRequest) -> (Result_8);
   create_invoice : (CreateInvoiceRequest) -> (Result);
