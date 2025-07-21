@@ -30,6 +30,14 @@ module.exports = {
   module: {
     rules: [
       { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
+      {
+        test: /\.css$/i,
+        use: [
+          "style-loader",
+          "css-loader",
+          "postcss-loader"
+        ],
+      },
     ],
   },
   plugins: [
@@ -51,5 +59,9 @@ module.exports = {
   devServer: {
     port: 8080,
     hot: true,
+    historyApiFallback: true,
+    static: {
+      directory: path.join(__dirname, 'dist'),
+    },
   },
 };
