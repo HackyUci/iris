@@ -186,7 +186,7 @@ const SelectRole: React.FC = () => {
             fontSize: '18px',
             color: '#6b7280'
           }}>
-            Registering user... ⏳
+            Registering user...
           </div>
         )}
       </div>
