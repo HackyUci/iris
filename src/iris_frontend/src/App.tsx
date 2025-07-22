@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoutes";
+import "./index.css";
 import LoginPage from "./pages/LoginPage";
 import SelectRole from "./pages/SelectRole";
 import MerchantDashboard from "./pages/MerchantDashboard";
@@ -9,7 +10,7 @@ import MerchantQRCode from "./pages/MerchantQrCode";
 import MerchantProfile from "./pages/MerchantProfile";
 import MerchantHistory from "./pages/MerchantHistory";
 import MerchantCashout from "./pages/MerchantCashout";
-import "./index.css";
+import MerchantSeeQrCode from "./pages/MerchantSeeQrCode";
 
 function App() {
   return (
@@ -77,6 +78,15 @@ function App() {
           element={
             <ProtectedRoute requireRole="Merchant">
               <MerchantCashout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/merchant-see-qr-code"
+          element={
+            <ProtectedRoute requireRole="Merchant">
+              <MerchantSeeQrCode />
             </ProtectedRoute>
           }
         />
