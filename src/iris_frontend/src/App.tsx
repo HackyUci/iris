@@ -13,7 +13,7 @@ import MerchantCashout from "./pages/MerchantCashout";
 import MerchantSeeQrCode from "./pages/MerchantSeeQrCode";
 import CustomerProfile from "./pages/CustomerProfile";
 import CustomerScan from "./pages/CustomerScan";
-import CustomerScanStatic from "./pages/CustomerScanStatic";
+import InputEnterAmount from "./pages/InputEnterAmount";
 import CustomerPaymentSuccess from "./pages/CustomerPaymentSuccess";
 
 function App() {
@@ -123,10 +123,10 @@ function App() {
         />
 
         <Route
-          path="/customer-scan-static"
+          path="/enter-amount"
           element={
             <ProtectedRoute requireRole="Customer">
-              <CustomerScanStatic />
+              <InputEnterAmount />
             </ProtectedRoute>
           }
         />
