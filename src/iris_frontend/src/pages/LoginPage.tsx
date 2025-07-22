@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e0f2fe] to-[#f0fdfa] px-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl px-8 py-10 text-center">
         <img src="/Logo_IRIS_gradient.svg" alt="Logo" className="w-48 h-24 mx-auto" />
         <p className="text-gray-500 mb-8">Making payment with crypto easy</p>

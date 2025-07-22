@@ -47,7 +47,7 @@ const SelectRole: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-sky-200 to-cyan-100 flex items-center justify-center px-4">
+    <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl px-8 py-10 text-center">
 
         <img src="/Logo_IRIS_gradient.svg" alt="Logo" className="w-48 h-24 mx-auto mb-4" />
