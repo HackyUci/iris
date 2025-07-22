@@ -9,39 +9,6 @@ const MerchantDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const mockTransactions = [
-    {
-      id: '1',
-      description: 'Tatang Suratang',
-      amount: '200,000',
-      currency: 'IDR',
-      btcAmount: '0.00019',
-      status: 'Pending' as const,
-      date: '21 July 2025',
-      time: '18:30'
-    },
-    {
-      id: '2',
-      description: 'Tatang Suratang',
-      amount: '200,000',
-      currency: 'IDR',
-      btcAmount: '0.00019',
-      status: 'Completed' as const,
-      date: '21 July 2025',
-      time: '18:30'
-    },
-    {
-      id: '3',
-      description: 'Tatang Suratang',
-      amount: '200,000',
-      currency: 'IDR',
-      btcAmount: '0.00019',
-      status: 'Completed' as const,
-      date: '21 July 2025',
-      time: '18:30'
-    }
-  ];
-
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
@@ -58,18 +25,6 @@ const MerchantDashboard = () => {
       } catch (error) {
         console.error('Failed to load dashboard:', error);
         setError('Failed to load dashboard data');
-        
-        setDashboardData({
-          balance: {
-            btcBalance: 1.214,
-            usdBalance: 900,
-            fiatBalance: 900,
-            currency: 'USD'
-          },
-          transactions: mockTransactions,
-          profile: null,
-          dashboard: null
-        });
       } finally {
         setLoading(false);
       }
@@ -120,14 +75,9 @@ const MerchantDashboard = () => {
     );
   }
 
-  const balance = dashboardData?.balance || {
-    btcBalance: 1.214,
-    usdBalance: 900,
-    fiatBalance: 900,
-    currency: 'USD'
-  };
+  const balance = dashboardData?.balance || { btcBalance: 0, usdBalance: 0 };
 
-  const transactions = dashboardData?.transactions || mockTransactions;
+  const transactions = dashboardData?.transactions || [];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -145,7 +95,7 @@ const MerchantDashboard = () => {
         )}
 
         <BalanceCard 
-          btcBalance={balance.btcBalance} 
+          btcBalance={balance.btcBalance}
           usdBalance={balance.usdBalance}
           onSeeMyQR={() => console.log('See My QR clicked')}
           onGenerate={() => console.log('Generate clicked')}
