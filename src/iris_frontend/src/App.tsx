@@ -7,8 +7,9 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import InputMerchantName from "./pages/InputMerchantName";
 import MerchantQRCode from "./pages/MerchantQrCode";
 import MerchantProfile from "./pages/MerchantProfile";
-import "./index.css";
 import MerchantHistory from "./pages/MerchantHistory";
+import MerchantCashout from "./pages/MerchantCashout";
+import "./index.css";
 
 function App() {
   return (
@@ -67,6 +68,15 @@ function App() {
           element={
             <ProtectedRoute requireRole="Merchant">
               <MerchantHistory />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/merchant-cashout"
+          element={
+            <ProtectedRoute requireRole="Merchant">
+              <MerchantCashout />
             </ProtectedRoute>
           }
         />
