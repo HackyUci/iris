@@ -7,13 +7,35 @@ const SelectRole: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleRoleSelect = async (role: 'Customer' | 'Merchant') => {
+  const handleRoleSelect = async (role: "Customer" | "Merchant") => {
+    if (loading) return;
+
     setSelectedRole(role);
     try {
       setLoading(true);
       const result = await authService.registerUser(role);
-      navigate(role === 'Merchant' ? '/merchant' : '/customer');
+
+      if (role === "Merchant") {
+        navigate("/input-merchant-name");
+      } else {
+        navigate("/customer");
+      }
     } catch (error: any) {
+      if (error.message && error.message.includes("already registered")) {
+        try {
+          const profile = await authService.getUserProfile();
+          if (profile) {
+            if (profile.role === "Merchant") {
+              navigate("/input-merchant-name");
+            } else {
+              navigate("/customer");
+            }
+            return;
+          }
+        } catch (profileError) {
+          console.error("Failed to get existing profile:", profileError);
+        }
+      }
       alert(`Registration failed: ${error.message}`);
     } finally {
       setLoading(false);
