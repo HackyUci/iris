@@ -1,24 +1,18 @@
-import React from 'react';
-import type { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
+import Navbar from './components/Navbar/Navbar';
 
 interface LayoutProps {
   children: ReactNode;
+  userRole: 'Customer' | 'Merchant' | null;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
   return (
     <div className="flex flex-col min-h-screen max-w-lg mx-auto bg-[#F2F2F2] shadow-xl">
-      <header className="px-4 py-3 bg-blue-600 text-white flex items-center justify-center text-lg font-semibold h-14 relative">
-        Iris Bitcoin Scanner
-      </header>
-      
-      <main className="flex-1 p-4 overflow-y-auto bg-gray-200">
+      <main className="flex-1 overflow-y-auto">
         {children}
       </main>
-
-      <div className="px-4 py-2 bg-slate-100 text-xs text-slate-500 text-center">
-        Powered by Internet Computer
-      </div>
+      {userRole && <Navbar userRole={userRole} />}
     </div>
   );
 };
