@@ -7,6 +7,7 @@ import {
   Copy,
   Edit3,
   Settings,
+  LogOut,
 } from "lucide-react";
 import { merchantDashboardService } from "../services/merchant-dashboard.service";
 
@@ -86,6 +87,17 @@ const MerchantProfile = () => {
   const formatSatoshi = (satoshi) => {
     if (!satoshi) return "0";
     return (Number(satoshi) / 100000000).toFixed(8);
+  };
+
+  const handleLogout = async () => {
+    try {
+      if (merchantDashboardService.logout) {
+        await merchantDashboardService.logout();
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   if (loading) {
@@ -307,6 +319,15 @@ const MerchantProfile = () => {
               unique identifier on the Internet Computer.
             </p>
           </div>
+        </div>
+
+        <div className="mt-8">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3 px-4 rounded-xl font-medium hover:bg-red-700 transition-colors">
+            <LogOut size={18} />
+            Log Out
+          </button>
         </div>
       </div>
     </div>
