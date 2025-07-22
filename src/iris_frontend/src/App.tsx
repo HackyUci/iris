@@ -8,6 +8,7 @@ import InputMerchantName from "./pages/InputMerchantName";
 import MerchantQRCode from "./pages/MerchantQrCode";
 import MerchantProfile from "./pages/MerchantProfile";
 import "./index.css";
+import MerchantHistory from "./pages/MerchantHistory";
 
 function App() {
   return (
@@ -57,6 +58,15 @@ function App() {
           element={
             <ProtectedRoute requireRole="Merchant">
               <MerchantProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/merchant-history"
+          element={
+            <ProtectedRoute requireRole="Merchant">
+              <MerchantHistory />
             </ProtectedRoute>
           }
         />
