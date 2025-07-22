@@ -1,10 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoutes';
-import LoginPage from './pages/LoginPage';
-import SelectRole from './pages/SelectRole';
-import MerchantDashboard from './pages/MerchantDashboard';
-import CustomerDashboard from './pages/CustomerDashboard';
-import './index.css';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoutes";
+import LoginPage from "./pages/LoginPage";
+import SelectRole from "./pages/SelectRole";
+import MerchantDashboard from "./pages/MerchantDashboard";
+import CustomerDashboard from "./pages/CustomerDashboard";
+import InputMerchantName from "./pages/InputMerchantName";
+import MerchantQRCode from "./pages/MerchantQrCode";
+import "./index.css";
 
 function App() {
   return (
@@ -13,20 +15,38 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
 
-        <Route 
-          path="/select-role" 
+        <Route
+          path="/select-role"
           element={
             <ProtectedRoute>
               <SelectRole />
             </ProtectedRoute>
-          } 
+          }
+        />
+
+        <Route
+          path="/input-merchant-name"
+          element={
+            <ProtectedRoute>
+              <InputMerchantName />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/merchant"
           element={
             <ProtectedRoute requireRole="Merchant">
-                <MerchantDashboard />
+              <MerchantDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/generate"
+          element={
+            <ProtectedRoute requireRole="Merchant">
+              <MerchantQRCode />
             </ProtectedRoute>
           }
         />
