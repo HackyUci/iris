@@ -78,7 +78,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireRole }
     return <Navigate to="/unauthorized" state={{ from: location }} />;
   }
 
-  return <Layout userRole={userRole}>{children}</Layout>;
+  return <Layout userRole={userRole} isAuthenticated={isAuthenticated}>{children}</Layout>;
 };
 
 export default ProtectedRoute;
