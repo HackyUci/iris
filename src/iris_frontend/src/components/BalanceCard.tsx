@@ -4,7 +4,6 @@ interface BalanceCardProps {
   btcBalance: number;
   usdBalance: number;
   onSeeMyQR?: () => void;
-  onGenerate?: () => void;
   onHistory?: () => void;
   onCashOut?: () => void;
 }
@@ -13,7 +12,6 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
   btcBalance, 
   usdBalance, 
   onSeeMyQR,
-  onGenerate,
   onHistory,
   onCashOut
 }) => {
@@ -37,7 +35,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
         </div>
       </div>
       
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <button 
           onClick={onSeeMyQR}
           className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
@@ -49,19 +47,7 @@ const BalanceCard: React.FC<BalanceCardProps> = ({
           </div>
           <span className="text-xs">See My QR</span>
         </button>
-        
-        <button 
-          onClick={onGenerate}
-          className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-        >
-          <div className="w-6 h-6 bg-white/20 rounded flex items-center justify-center">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd"/>
-            </svg>
-          </div>
-          <span className="text-xs">Generate</span>
-        </button>
-        
+   
         <button 
           onClick={onHistory}
           className="flex flex-col items-center space-y-1 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
