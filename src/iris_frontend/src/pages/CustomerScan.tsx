@@ -90,8 +90,7 @@ const CustomerScan = () => {
           raw: qrData,
         };
       }
-    } catch (e) {
-    }
+    } catch (e) {}
 
     return {
       type: "unknown",
@@ -116,7 +115,10 @@ const CustomerScan = () => {
   };
 
   const handleProceedToPayment = () => {
-    console.log("Proceeding to payment with:", scannedData);
+    if (scannedData) {
+      sessionStorage.setItem("scannedQRData", JSON.stringify(scannedData));
+      window.location.href = "/enter-amount";
+    }
   };
 
   if (loading) {
@@ -197,17 +199,6 @@ const CustomerScan = () => {
                   </div>
                 )}
 
-                {scannedData.amount && (
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">
-                      Amount
-                    </span>
-                    <span className="text-sm text-gray-900">
-                      {scannedData.amount} BTC
-                    </span>
-                  </div>
-                )}
-
                 {scannedData.label && (
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                     <span className="text-sm font-medium text-gray-700">
@@ -242,7 +233,7 @@ const CustomerScan = () => {
                   onClick={handleProceedToPayment}
                   className="px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
                 >
-                  Proceed to Pay
+                  Next
                 </button>
               </div>
             </div>

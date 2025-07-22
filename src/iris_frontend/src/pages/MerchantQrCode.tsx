@@ -239,7 +239,6 @@ const MerchantQRCode = () => {
                     alt="Bitcoin Payment QR Code"
                     className="w-48 h-48 border-2 border-gray-200 rounded-xl bg-white"
                   />
-                  {/* Hidden canvas for sharing/download */}
                   <canvas
                     ref={canvasRef}
                     className="hidden"

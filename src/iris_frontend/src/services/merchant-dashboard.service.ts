@@ -34,6 +34,7 @@ interface BackendService {
 class MerchantDashboardService implements IMerchantDashboardService {
   private actor: BackendService | null = null;
   private authClient: AuthClient | null = null;
+  identity: null;
 
   private async initializeActor(): Promise<void> {
     if (this.actor) return;
@@ -198,6 +199,14 @@ class MerchantDashboardService implements IMerchantDashboardService {
       false,
       'Error checking authentication'
     );
+  }
+
+  async logout(): Promise<void> {
+    if (this.authClient) {
+      await this.authClient.logout();
+    }
+    this.identity = null;
+    this.actor = null;
   }
 }
 

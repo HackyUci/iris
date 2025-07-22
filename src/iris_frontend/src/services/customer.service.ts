@@ -27,6 +27,7 @@ interface BackendCustomerService {
 class CustomerService {
   private actor: BackendCustomerService | null = null;
   private authClient: AuthClient | null = null;
+  identity: null;
 
   private async initializeActor(): Promise<void> {
     if (this.actor) return;
@@ -208,6 +209,14 @@ class CustomerService {
       );
       return false;
     }
+  }
+
+  async logout(): Promise<void> {
+    if (this.authClient) {
+      await this.authClient.logout();
+    }
+    this.identity = null;
+    this.actor = null;
   }
 
   formatPaymentMethod(method: PaymentMethod): string {

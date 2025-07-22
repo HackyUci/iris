@@ -55,3 +55,4 @@ pub fn whoami() -> String {
 pub fn greet(name: String) -> String {
     format!("Hello, {}! Welcome to Iris Bitcoin Payment System.", name)
 }
+

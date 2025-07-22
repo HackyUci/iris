@@ -13,6 +13,8 @@ import MerchantCashout from "./pages/MerchantCashout";
 import MerchantSeeQrCode from "./pages/MerchantSeeQrCode";
 import CustomerProfile from "./pages/CustomerProfile";
 import CustomerScan from "./pages/CustomerScan";
+import InputEnterAmount from "./pages/InputEnterAmount";
+import CustomerPaymentSuccess from "./pages/CustomerPaymentSuccess";
 import Landing from "./pages/Landing";
 
 function App() {
@@ -117,6 +119,24 @@ function App() {
           element={
             <ProtectedRoute requireRole="Customer">
               <CustomerScan />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/enter-amount"
+          element={
+            <ProtectedRoute requireRole="Customer">
+              <InputEnterAmount />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/customer-payment-success"
+          element={
+            <ProtectedRoute requireRole="Customer">
+              <CustomerPaymentSuccess />
             </ProtectedRoute>
           }
         />
