@@ -49,10 +49,6 @@ const InputMerchantName = () => {
     }
   };
 
-  const handleBack = () => {
-    navigate("/select-role");
-  };
-
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSubmit();
@@ -138,14 +134,6 @@ const InputMerchantName = () => {
             )}
           </button>
         </div>
-
-        <button
-          onClick={handleBack}
-          disabled={loading}
-          className="mt-6 text-gray-400 hover:text-white transition-colors duration-200 text-sm flex items-center justify-center mx-auto"
-        >
-          ← Back to role selection
-        </button>
 
         {loading && (
           <div className="mt-6 flex flex-col items-center">
