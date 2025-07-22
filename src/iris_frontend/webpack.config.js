@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -38,11 +39,23 @@ module.exports = {
           "postcss-loader"
         ],
       },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: 'asset/resource',
+      },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "index.html"),
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, "public"),
+          to: path.join(__dirname, "dist"),
+        },
+      ],
     }),
     new webpack.DefinePlugin({
       'process.env.CANISTER_ID_IRIS_BACKEND': JSON.stringify(process.env.CANISTER_ID_IRIS_BACKEND),
