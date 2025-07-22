@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { User, Calendar, TrendingUp, Copy, RefreshCw } from "lucide-react";
+import { 
+  User, 
+  Calendar, 
+  TrendingUp, 
+  Copy, 
+  RefreshCw, 
+  LogOut
+} from "lucide-react";
 import { customerService } from "../services/customer.service";
 
 const CustomerProfile = () => {
@@ -107,6 +114,17 @@ const CustomerProfile = () => {
       </div>
     );
   }
+
+  const handleLogout = async () => {
+      try {
+        if (customerService.logout) {
+          await customerService.logout();
+          window.location.reload();
+        }
+      } catch (err) {
+        console.error("Logout failed:", err);
+      }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -247,6 +265,15 @@ const CustomerProfile = () => {
               Internet Computer.
             </p>
           </div>
+        </div>
+        
+        <div className="mt-8">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3 px-4 rounded-xl font-medium hover:bg-red-700 transition-colors">
+            <LogOut size={18} />
+            Log Out
+          </button>
         </div>
       </div>
     </div>
