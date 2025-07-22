@@ -13,6 +13,8 @@ import MerchantCashout from "./pages/MerchantCashout";
 import MerchantSeeQrCode from "./pages/MerchantSeeQrCode";
 import CustomerProfile from "./pages/CustomerProfile";
 import CustomerScan from "./pages/CustomerScan";
+import CustomerScanStatic from "./pages/CustomerScanStatic";
+import CustomerPaymentSuccess from "./pages/CustomerPaymentSuccess";
 
 function App() {
   return (
@@ -116,6 +118,24 @@ function App() {
           element={
             <ProtectedRoute requireRole="Customer">
               <CustomerScan />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/customer-scan-static"
+          element={
+            <ProtectedRoute requireRole="Customer">
+              <CustomerScanStatic />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/customer-payment-success"
+          element={
+            <ProtectedRoute requireRole="Customer">
+              <CustomerPaymentSuccess />
             </ProtectedRoute>
           }
         />
