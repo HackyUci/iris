@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoutes';
 import LoginPage from './pages/LoginPage';
@@ -27,7 +26,7 @@ function App() {
           path="/merchant"
           element={
             <ProtectedRoute requireRole="Merchant">
-              <MerchantDashboard />
+                <MerchantDashboard />
             </ProtectedRoute>
           }
         />
