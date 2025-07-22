@@ -51,7 +51,7 @@ export interface ScannedInvoice {
 export interface PaymentRequest {
   invoice_id: string;
   payment_method: PaymentMethod;
-  usd_amount?: number; // For USD payment method
+  usd_amount?: number; 
 }
 
 export interface PaymentMethodOption {
@@ -65,8 +65,6 @@ export interface PaymentMethodOption {
 export interface RegisterUserRequest {
   role: UserRole;
 }
-
-// UI Types for Customer
 export interface UICustomerBalanceData {
   btcBalance: number;
   usdBalance: number;
