@@ -12,6 +12,7 @@ import MerchantHistory from "./pages/MerchantHistory";
 import MerchantCashout from "./pages/MerchantCashout";
 import MerchantSeeQrCode from "./pages/MerchantSeeQrCode";
 import CustomerProfile from "./pages/CustomerProfile";
+import CustomerScan from "./pages/CustomerScan";
 
 function App() {
   return (
@@ -106,6 +107,15 @@ function App() {
           element={
             <ProtectedRoute requireRole="Customer">
               <CustomerProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/customer-scan"
+          element={
+            <ProtectedRoute requireRole="Customer">
+              <CustomerScan />
             </ProtectedRoute>
           }
         />
