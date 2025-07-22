@@ -6,6 +6,7 @@ import MerchantDashboard from "./pages/MerchantDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import InputMerchantName from "./pages/InputMerchantName";
 import MerchantQRCode from "./pages/MerchantQrCode";
+import MerchantProfile from "./pages/MerchantProfile";
 import "./index.css";
 
 function App() {
@@ -47,6 +48,15 @@ function App() {
           element={
             <ProtectedRoute requireRole="Merchant">
               <MerchantQRCode />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/merchant-profile"
+          element={
+            <ProtectedRoute requireRole="Merchant">
+              <MerchantProfile />
             </ProtectedRoute>
           }
         />
