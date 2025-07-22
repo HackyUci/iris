@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
-import BalanceCard from '../components/BalanceCard';
-import TransactionCard from '../components/TransactionCard';
-import { merchantDashboardService } from '../services/merchant-dashboard.service';
-import type { UIDashboardData } from '../types/merchant.type';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import BalanceCard from "../components/BalanceCard";
+import TransactionCard from "../components/TransactionCard";
+import { merchantDashboardService } from "../services/merchant-dashboard.service";
+import type { UIDashboardData } from "../types/merchant.type";
 
 const MerchantDashboard = () => {
-  const [dashboardData, setDashboardData] = useState<UIDashboardData | null>(null);
+  const navigate = useNavigate();
+  const [dashboardData, setDashboardData] = useState<UIDashboardData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,15 +20,14 @@ const MerchantDashboard = () => {
         setError(null);
         const isAuth = await merchantDashboardService.isAuthenticated();
         if (!isAuth) {
-          setError('Please login to view dashboard');
+          setError("Please login to view dashboard");
           return;
         }
         const data = await merchantDashboardService.getDashboardData();
         setDashboardData(data);
-        
       } catch (error) {
-        console.error('Failed to load dashboard:', error);
-        setError('Failed to load dashboard data');
+        console.error("Failed to load dashboard:", error);
+        setError("Failed to load dashboard data");
       } finally {
         setLoading(false);
       }
@@ -40,10 +43,10 @@ const MerchantDashboard = () => {
         setDashboardData(data);
         setError(null);
       } catch (error) {
-        setError('Failed to refresh data');
+        setError("Failed to refresh data");
       }
     };
-    
+
     await loadData();
   };
 
@@ -64,7 +67,7 @@ const MerchantDashboard = () => {
         <div className="text-center">
           <div className="text-red-500 mb-4">⚠️</div>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button 
+          <button
             onClick={handleRefresh}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
@@ -85,7 +88,7 @@ const MerchantDashboard = () => {
         {error && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-center justify-between">
             <span className="text-yellow-800 text-sm">{error}</span>
-            <button 
+            <button
               onClick={handleRefresh}
               className="text-yellow-600 hover:text-yellow-800 text-sm font-medium"
             >
@@ -94,18 +97,17 @@ const MerchantDashboard = () => {
           </div>
         )}
 
-        <BalanceCard 
+        <BalanceCard
           btcBalance={balance.btcBalance}
           usdBalance={balance.usdBalance}
-          onSeeMyQR={() => console.log('See My QR clicked')}
-          onGenerate={() => console.log('Generate clicked')}
-          onHistory={() => console.log('History clicked')}
-          onCashOut={() => console.log('Cash Out clicked')}
+          onSeeMyQR={() => console.log("See My QR clicked")}
+          onHistory={() => navigate("/merchant-history")}
+          onCashOut={() => console.log("Cash Out clicked")}
         />
-        
-        <TransactionCard 
+
+        <TransactionCard
           transactions={transactions}
-          onViewAll={() => console.log('View All clicked')}
+          onViewAll={() => console.log("View All clicked")}
         />
       </div>
     </div>
