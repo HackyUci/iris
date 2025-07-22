@@ -29,7 +29,7 @@ const Navbar = ({ userRole }: { userRole: 'Customer' | 'Merchant' }) => {
   };
 
   const handleProfileClick = () => {
-    navigate('/profile');
+    navigate('/merchant-profile');
   };
 
   return (
