@@ -12,5 +12,8 @@
     },
     "workspaces": [
         "src/iris_frontend"
-    ]
+    ],
+    "devDependencies": {
+        "copy-webpack-plugin": "^13.0.0"
+    }
 }
