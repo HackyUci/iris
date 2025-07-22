@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft } from 'lucide-react';
-import SuccessAnimation from '../components/SuccessAnimation';
-import PaymentSummary from '../components/PaymentSummary';
+import React, { useState, useEffect } from "react";
+import { ChevronLeft } from "lucide-react";
+import SuccessAnimation from "../components/SuccessAnimation";
+import PaymentSummary from "../components/PaymentSummary";
 
 interface PaymentSuccessData {
-  amount: string;
-  currency: string;
-  merchantName: string;
   transactionId: string;
-  date: string;
+  amount: number;
+  currency: string;
+  btcAmount: number;
+  merchantName: string;
   paymentMethod: string;
+  status: string;
+  timestamp: number;
 }
 
 const CustomerPaymentSuccess: React.FC = () => {
-  const [paymentData, setPaymentData] = useState<PaymentSuccessData | null>(null);
+  const [paymentData, setPaymentData] = useState<PaymentSuccessData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,32 +25,75 @@ const CustomerPaymentSuccess: React.FC = () => {
   }, []);
 
   const loadPaymentData = () => {
-    // In real implementation, this would come from route params or global state
-    setTimeout(() => {
+    try {
+      const storedPaymentResult = sessionStorage.getItem("paymentResult");
+      if (storedPaymentResult) {
+        const parsedData = JSON.parse(storedPaymentResult);
+        setPaymentData(parsedData);
+        sessionStorage.removeItem("paymentResult");
+        sessionStorage.removeItem("scannedQRData");
+      } else {
+        setPaymentData({
+          transactionId: "TXN-DEMO-" + Date.now(),
+          amount: 25.0,
+          currency: "USD",
+          btcAmount: 0.00056,
+          merchantName: "Demo Coffee Shop",
+          paymentMethod: "USD Payment",
+          status: "Completed",
+          timestamp: Date.now(),
+        });
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error loading payment data:", error);
       setPaymentData({
-        amount: '$97',
-        currency: 'USD',
-        merchantName: 'QRIS Coffee Shop',
-        transactionId: 'TXN-000123',
-        date: new Date().toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        }),
-        paymentMethod: 'USD Payment'
+        transactionId: "TXN-ERROR-" + Date.now(),
+        amount: 0,
+        currency: "USD",
+        btcAmount: 0,
+        merchantName: "Unknown Merchant",
+        paymentMethod: "Unknown",
+        status: "Error",
+        timestamp: Date.now(),
       });
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleBackToHome = () => {
-    window.history.go(-3);
+    window.location.href = "/";
   };
 
   const handleViewDetails = () => {
-    console.log('Navigate to transaction details');
+    console.log("Navigate to transaction details");
+  };
+
+  const formatAmount = (amount: number, currency: string): string => {
+    const symbols = {
+      USD: "$",
+      GBP: "£",
+      SGD: "S$",
+      IDR: "Rp",
+    };
+
+    const symbol = symbols[currency as keyof typeof symbols] || currency;
+
+    if (currency === "IDR") {
+      return `${symbol}${amount.toLocaleString("id-ID")}`;
+    }
+
+    return `${symbol}${amount.toLocaleString()}`;
+  };
+
+  const formatDate = (timestamp: number): string => {
+    return new Date(timestamp).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   if (loading) {
@@ -90,14 +137,28 @@ const CustomerPaymentSuccess: React.FC = () => {
         </div>
 
         {paymentData && (
-          <PaymentSummary 
-            amount={paymentData.amount}
+          <PaymentSummary
+            amount={formatAmount(paymentData.amount, paymentData.currency)}
             currency={paymentData.currency}
             merchantName={paymentData.merchantName}
             transactionId={paymentData.transactionId}
-            date={paymentData.date}
+            date={formatDate(paymentData.timestamp)}
             paymentMethod={paymentData.paymentMethod}
           />
+        )}
+
+        {paymentData && paymentData.btcAmount > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="text-center">
+              <h3 className="text-blue-800 font-medium mb-1">Bitcoin Amount</h3>
+              <p className="text-lg font-semibold text-blue-900">
+                {paymentData.btcAmount.toFixed(8)} BTC
+              </p>
+              <p className="text-xs text-blue-700 mt-1">
+                Equivalent amount paid to merchant
+              </p>
+            </div>
+          </div>
         )}
 
         <div className="space-y-3 pt-4">
@@ -107,7 +168,7 @@ const CustomerPaymentSuccess: React.FC = () => {
           >
             View Transaction Details
           </button>
-          
+
           <button
             onClick={handleBackToHome}
             className="w-full px-4 py-4 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors border border-gray-300"
@@ -126,7 +187,8 @@ const CustomerPaymentSuccess: React.FC = () => {
                 Payment Confirmed
               </p>
               <p className="text-green-700 text-xs mt-1">
-                The merchant has been notified and will process your order shortly.
+                The merchant has been notified and will process your order
+                shortly.
               </p>
             </div>
           </div>
