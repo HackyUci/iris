@@ -24,7 +24,7 @@ const Navbar = ({ userRole }: { userRole: 'Customer' | 'Merchant' }) => {
     if (userRole === 'Merchant') {
       navigate('/generate');
     } else {
-      navigate('/scan');
+      navigate('/customer-scan');
     }
   };
 
