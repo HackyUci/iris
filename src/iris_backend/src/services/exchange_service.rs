@@ -23,4 +23,14 @@ impl ExchangeService {
         let btc_rate = Self::get_btc_rate(currency);
         btc_amount * btc_rate
     }
+    
+    pub fn btc_to_fiat(btc_amount: f64, currency: &Currency) -> f64 {
+        let btc_rate = Self::get_btc_rate(currency);
+        btc_amount * btc_rate
+    }
+    
+    pub fn fiat_to_btc(fiat_amount: f64, currency: &Currency) -> f64 {
+        let btc_rate = Self::get_btc_rate(currency);
+        fiat_amount / btc_rate
+    }
 }
