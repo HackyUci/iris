@@ -102,7 +102,7 @@ const MerchantDashboard = () => {
           usdBalance={balance.usdBalance}
           onSeeMyQR={() => console.log("See My QR clicked")}
           onHistory={() => navigate("/merchant-history")}
-          onCashOut={() => console.log("Cash Out clicked")}
+          onCashOut={() => navigate("/merchant-cashout")}
         />
 
         <TransactionCard
