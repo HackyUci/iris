@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/auth.service';
+import Layout from '../layout';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -8,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireRole }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userRole, setUserRole] = useState<'Customer' | 'Merchant' | null>(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -22,15 +23,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireRole }
 
         if (isAuth) {
           const profile = await authService.getUserProfile();
-          if (profile) {
-            setUserRole(profile.role);
-          } else {
-            console.log('User authenticated but no profile found');
-          }
+          setUserRole(profile?.role || null);
+        } else {
+          setIsAuthenticated(false);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
         setIsAuthenticated(false);
+        setUserRole(null);
       } finally {
         setLoading(false);
       }
@@ -39,7 +39,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireRole }
     checkAuth();
   }, []);
 
-  if (loading) {
+  if (loading || isAuthenticated === null) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -67,21 +67,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireRole }
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" state={{ from: location }} />;
   }
 
-  if (!userRole) {
-    if (location.pathname === '/select-role') {
-      return <>{children}</>;
-    }
-    return <Navigate to="/select-role" />;
+  if (!userRole && location.pathname !== '/select-role') {
+    return <Navigate to="/select-role" state={{ from: location }} />;
   }
 
   if (requireRole && userRole !== requireRole) {
-    return <Navigate to="/unauthorized" />;
+    return <Navigate to="/unauthorized" state={{ from: location }} />;
   }
 
-  return <>{children}</>;
+  return <Layout userRole={userRole}>{children}</Layout>;
 };
 
 export default ProtectedRoute;
