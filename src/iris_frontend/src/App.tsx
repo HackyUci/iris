@@ -15,12 +15,13 @@ import CustomerProfile from "./pages/CustomerProfile";
 import CustomerScan from "./pages/CustomerScan";
 import InputEnterAmount from "./pages/InputEnterAmount";
 import CustomerPaymentSuccess from "./pages/CustomerPaymentSuccess";
+import Landing from "./pages/Landing";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route
