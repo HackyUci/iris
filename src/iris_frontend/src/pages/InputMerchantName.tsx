@@ -56,99 +56,95 @@ const InputMerchantName = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl animate-float"></div>
-        <div className="w-96 h-96 rounded-full bg-purple-500 opacity-10 blur-3xl animate-float-delay"></div>
-      </div>
-
-      <div className="max-w-md w-full mx-auto text-center relative z-10 bg-gray-100 bg-opacity-70 backdrop-blur-lg rounded-2xl p-8 border border-gray-700 shadow-2xl">
-        <div className="mb-8">
-          <div className="w-16 h-16 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Store size={32} className="text-blue-400" />
-          </div>
-          <h1 className="text-3xl font-bold text-black mb-2">
-            Setup Your Business
-          </h1>
-          <p className="text-gray-400">
-            Enter your business name to get started with Bitcoin payments
-          </p>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl px-8 py-10 text-center">
+        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Store size={32} className="text-blue-500" />
         </div>
 
-        <div className="space-y-6">
-          <div className="text-left">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Business Name
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Building2 size={18} className="text-gray-500" />
-              </div>
-              <input
-                type="text"
-                value={businessName}
-                onChange={(e) => {
-                  setBusinessName(e.target.value);
-                  if (error) setError(null);
-                }}
-                onKeyPress={handleKeyPress}
-                placeholder="Enter your business name"
-                className="w-full pl-12 pr-4 py-4 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none"
-                disabled={loading}
-                maxLength={100}
-                autoFocus
-              />
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Setup Your Business</h1>
+        <p className="text-gray-500 text-sm mb-6">
+          Enter your business name to get started with Bitcoin payments
+        </p>
+
+        <div className="text-left mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Business Name
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Building2 size={18} className="text-gray-400" />
             </div>
-            <div className="flex justify-between mt-2">
-              <span className="text-xs text-gray-500">
-                {businessName.length}/100 characters
-              </span>
-            </div>
+            <input
+              type="text"
+              value={businessName}
+              onChange={(e) => {
+                setBusinessName(e.target.value);
+                if (error) setError(null);
+              }}
+              onKeyPress={handleKeyPress}
+              placeholder="Enter your business name"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition outline-none"
+              disabled={loading}
+              maxLength={100}
+              autoFocus
+            />
           </div>
+          <div className="flex justify-between mt-1">
+            <span className="text-xs text-gray-400">
+              {businessName.length}/100 characters
+            </span>
+          </div>
+        </div>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4">
-              <p className="text-red-400 text-sm">{error}</p>
-            </div>
-          )}
+        {error && (
+          <div className="bg-red-100 border border-red-200 rounded-xl p-4 mb-4">
+            <p className="text-red-500 text-sm">{error}</p>
+          </div>
+        )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !businessName.trim()}
-            className={`w-full py-4 px-6 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center ${
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !businessName.trim()}
+          className={`w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl text-white font-semibold text-sm transition-all duration-300
+            ${
               loading || !businessName.trim()
-                ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
-            }`}
-          >
-            {loading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                Creating Account...
-              </>
-            ) : (
-              <>
-                Continue
-                <ArrowRight size={18} className="ml-2" />
-              </>
-            )}
-          </button>
-        </div>
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-green-400 hover:shadow-lg hover:brightness-105"
+            }
+          `}
+        >
+          {loading ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Creating Account...
+            </>
+          ) : (
+            <>
+              Continue
+              <ArrowRight size={18} />
+            </>
+          )}
+        </button>
 
         {loading && (
-          <div className="mt-6 flex flex-col items-center">
+          <div className="mt-8 flex flex-col items-center">
             <div className="relative w-12 h-12">
-              <div className="w-full h-full border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute"></div>
-              <div className="w-full h-full border-4 border-purple-500 border-t-transparent rounded-full animate-spin-reverse absolute opacity-70"></div>
+              <div className="absolute w-full h-full border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute w-full h-full border-4 border-green-400 border-t-transparent rounded-full animate-spin-reverse opacity-70"></div>
             </div>
-            <p className="text-gray-400 mt-4 text-sm font-medium">
+            <p className="text-gray-500 mt-4 text-sm font-medium">
               Setting up your merchant account...
             </p>
-            <p className="text-gray-500 text-xs mt-1">
+            <p className="text-gray-400 text-xs mt-1">
               This may take a few moments
             </p>
           </div>
         )}
+
+        <div className="mt-10 border-t pt-4 text-gray-400 text-xs">
+          Secure merchant onboarding powered by ICP
+        </div>
       </div>
     </div>
   );
