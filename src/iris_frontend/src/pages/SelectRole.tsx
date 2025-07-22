@@ -4,17 +4,16 @@ import { authService } from '../services/auth.service';
 
 const SelectRole: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleRoleSelect = async (role: 'Customer' | 'Merchant') => {
-    console.log('Role selected:', role);
+    setSelectedRole(role);
     try {
       setLoading(true);
       const result = await authService.registerUser(role);
-      console.log('Registration successful:', result);
       navigate(role === 'Merchant' ? '/merchant' : '/customer');
     } catch (error: any) {
-      console.error('Registration failed:', error);
       alert(`Registration failed: ${error.message}`);
     } finally {
       setLoading(false);
@@ -27,166 +26,91 @@ const SelectRole: React.FC = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      backgroundColor: '#f8fafc',
-      padding: '20px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    }}>
-      <div style={{
-        maxWidth: '800px',
-        margin: '0 auto'
-      }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '40px'
-        }}>
-          <h1 style={{
-            fontSize: '36px',
-            fontWeight: 'bold',
-            color: '#1f2937',
-            margin: '0'
-          }}>
-            Welcome to Iris! 🌈
-          </h1>
+    <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-64 h-64 rounded-full bg-blue-500 opacity-10 blur-3xl animate-float"></div>
+        <div className="w-96 h-96 rounded-full bg-purple-500 opacity-10 blur-3xl animate-float-delay"></div>
+      </div>
+
+      <div className="max-w-md w-full mx-auto text-center relative z-10 bg-gray-100 bg-opacity-70 backdrop-blur-lg rounded-2xl p-8 border border-gray-700 shadow-2xl">
+        <h1 className="text-3xl font-bold text-black mb-2">Select Your Role</h1>
+        <p className="text-gray-400 mb-8">Choose how you want to interact with the platform</p>
+
+        <div className="space-y-4 mb-6">
           <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: '#ef4444',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}
+            onClick={() => !loading && handleRoleSelect('Merchant')}
+            onMouseEnter={() => setSelectedRole('Merchant')}
+            onMouseLeave={() => setSelectedRole(null)}
+            className={`w-full py-4 px-6 rounded-xl border-2 transition-all duration-300 flex items-center justify-between ${
+              selectedRole === 'Merchant' 
+                ? 'border-blue-500 bg-gray-700 shadow-lg shadow-blue-500/20' 
+                : 'border-gray-700 hover:border-blue-400'
+            } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading}
           >
-            Logout
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-blue-500 bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-black">Merchant</h3>
+                <p className="text-xs text-gray-400">Manage your business and products</p>
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <button
+            onClick={() => !loading && handleRoleSelect('Customer')}
+            onMouseEnter={() => setSelectedRole('Customer')}
+            onMouseLeave={() => setSelectedRole(null)}
+            className={`w-full py-4 px-6 rounded-xl border-2 transition-all duration-300 flex items-center justify-between ${
+              selectedRole === 'Customer' 
+                ? 'border-purple-500 bg-gray-700 shadow-lg shadow-purple-500/20' 
+                : 'border-gray-700 hover:border-purple-400'
+            } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading}
+          >
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-purple-500 bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-black">Customer</h3>
+                <p className="text-xs text-gray-400">Browse and purchase products</p>
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
 
-        <p style={{
-          color: '#6b7280',
-          textAlign: 'center',
-          marginBottom: '40px',
-          fontSize: '20px'
-        }}>
-          Choose your role to continue:
-        </p>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '30px',
-          maxWidth: '600px',
-          margin: '0 auto'
-        }}>
-          <div
-            onClick={() => !loading && handleRoleSelect('Merchant')}
-            style={{
-              backgroundColor: 'white',
-              padding: '40px',
-              borderRadius: '16px',
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-              border: '3px solid #10b981',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1,
-              textAlign: 'center',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              transform: loading ? 'none' : 'scale(1)',
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) {
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
-              }
-            }}
-          >
-            <div style={{ fontSize: '60px', marginBottom: '20px' }}>🏪</div>
-            <h3 style={{
-              fontSize: '24px',
-              fontWeight: '600',
-              color: '#1f2937',
-              marginBottom: '15px',
-              margin: '0 0 15px 0'
-            }}>
-              Merchant
-            </h3>
-            <p style={{
-              color: '#6b7280',
-              fontSize: '16px',
-              lineHeight: '1.5',
-              margin: '0'
-            }}>
-              Create invoices, generate QR codes, manage Bitcoin payments
-            </p>
-          </div>
-
-          <div
-            onClick={() => !loading && handleRoleSelect('Customer')}
-            style={{
-              backgroundColor: 'white',
-              padding: '40px',
-              borderRadius: '16px',
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-              border: '3px solid #3b82f6',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1,
-              textAlign: 'center',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              transform: loading ? 'none' : 'scale(1)',
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) {
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
-              }
-            }}
-          >
-            <div style={{ fontSize: '60px', marginBottom: '20px' }}>💳</div>
-            <h3 style={{
-              fontSize: '24px',
-              fontWeight: '600',
-              color: '#1f2937',
-              marginBottom: '15px',
-              margin: '0 0 15px 0'
-            }}>
-              Customer
-            </h3>
-            <p style={{
-              color: '#6b7280',
-              fontSize: '16px',
-              lineHeight: '1.5',
-              margin: '0'
-            }}>
-              Scan QR codes, make Bitcoin payments
-            </p>
-          </div>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="text-gray-400 hover:text-white transition-colors duration-200 text-sm flex items-center justify-center mx-auto"
+          disabled={loading}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Sign out
+        </button>
 
         {loading && (
-          <div style={{
-            textAlign: 'center',
-            marginTop: '30px',
-            fontSize: '18px',
-            color: '#6b7280'
-          }}>
-            Registering user...
+          <div className="mt-6 flex flex-col items-center">
+            <div className="relative w-12 h-12">
+              <div className="w-full h-full border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute"></div>
+              <div className="w-full h-full border-4 border-purple-500 border-t-transparent rounded-full animate-spin-reverse absolute opacity-70"></div>
+            </div>
+            <p className="text-gray-400 mt-4 text-sm font-medium">Completing authorization...</p>
+            <p className="text-gray-500 text-xs mt-1">Confirming with your wallet</p>
           </div>
         )}
       </div>
