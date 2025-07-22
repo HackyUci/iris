@@ -1,12 +1,7 @@
 import { AuthClient } from '@dfinity/auth-client';
 import { Identity } from '@dfinity/agent';
 import { createActor } from '../declarations/index.js';
-
-export interface UserProfile {
-  role: 'Customer' | 'Merchant';
-  user_principal?: any;
-  created_at?: any;
-}
+import { UserProfile } from '../types/user.type.js';
 
 class AuthService {
   private authClient: AuthClient | null = null;
