@@ -6,6 +6,9 @@ module.exports = {
       colors: {
         bitcoin: '#f7931a',
       },
+      fontFamily: {
+        sans: ['Instrument Sans', 'sans-serif'],
+      },
     },
   },
   plugins: [],
