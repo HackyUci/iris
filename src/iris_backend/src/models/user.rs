@@ -1,11 +1,6 @@
 use candid::{CandidType, Deserialize, Principal};
 use serde::Serialize;
-
-#[derive(CandidType, Deserialize, Serialize, Clone, Debug, PartialEq)]
-pub enum UserRole {
-    Customer,
-    Merchant,
-}
+use crate::models::enums::UserRole;
 
 #[derive(CandidType, Deserialize, Serialize, Clone, Debug)]
 pub struct UserProfile {
