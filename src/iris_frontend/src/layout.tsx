@@ -4,15 +4,16 @@ import Navbar from './components/Navbar/Navbar';
 interface LayoutProps {
   children: ReactNode;
   userRole: 'Customer' | 'Merchant' | null;
+  isAuthenticated: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
+const Layout: React.FC<LayoutProps> = ({ children, userRole, isAuthenticated }) => {
   return (
     <div className="flex flex-col min-h-screen max-w-lg mx-auto bg-[#F2F2F2] shadow-xl">
       <main className="flex-1 overflow-y-auto">
         {children}
       </main>
-      {userRole && <Navbar userRole={userRole} />}
+       {isAuthenticated && userRole && <Navbar userRole={userRole} />}
     </div>
   );
 };
