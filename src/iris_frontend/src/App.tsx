@@ -13,12 +13,13 @@ import MerchantCashout from "./pages/MerchantCashout";
 import MerchantSeeQrCode from "./pages/MerchantSeeQrCode";
 import CustomerProfile from "./pages/CustomerProfile";
 import CustomerScan from "./pages/CustomerScan";
+import Landing from "./pages/Landing";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route
