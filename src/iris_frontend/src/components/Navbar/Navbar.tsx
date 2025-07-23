@@ -51,7 +51,7 @@ const Navbar = ({ userRole }: { userRole: 'Customer' | 'Merchant' }) => {
 
         <button
           onClick={handleCenterButtonClick}
-          className="relative flex flex-col items-center justify-center p-4 bg-gradient-to-r from-cyan-400 to-green-400 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+          className="relative flex flex-col w-20 h-20 items-center justify-center p-4 bg-gradient-to-r from-cyan-400 to-green-400 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
         >
           {userRole === 'Merchant' ? (
             <>
