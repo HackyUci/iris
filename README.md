@@ -198,6 +198,11 @@ If you are hosting frontend code somewhere without using DFX, you may need to ma
 - [ic-cdk-macros](https://docs.rs/ic-cdk-macros)
 - [Candid Introduction](https://internetcomputer.org/docs/current/developer-docs/backend/candid/)
 
+## Pitch Deck 📊
+
+To better understand the concept and vision of IRIS, please take a look at our pitch deck:
+
+👉 [View IRIS Pitch Deck on Google Drive](https://drive.google.com/file/d/1e7ail7TypnUQbbQprgmZzh_HUloN2ak8/view?usp=sharing)
 
 ## Contact
 
